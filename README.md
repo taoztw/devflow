@@ -19,3 +19,5 @@ npm run lint # 检查代码
 
 修改`.eslintrc.json`
 创建`.vscode/settings.json`
+
+> 安装 eslint, prettier vscode插件
