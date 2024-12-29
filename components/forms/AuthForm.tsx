@@ -45,6 +45,7 @@ export function AuthForm<T extends FieldValues>({
 
   const handleSubmit: SubmitHandler<T> = async () => {
     // TODO: Handle form submission.
+    onSubmit(form.getValues());
   };
 
   const buttonText = formType === "SIGN_IN" ? "Sign In" : "Sign Up";
