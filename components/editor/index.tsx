@@ -50,7 +50,7 @@ const Editor = ({
     <MDXEditor
       key={resolvedTheme}
       markdown={markdown}
-      className="background-light800_dark200 light-border-2 markdown-editor dark-editor w-full border"
+      className="background-light800_dark200 light-border-2 markdown-editor dark-editor grid w-full border"
       onChange={fieldChange}
       plugins={[
         // Example Plugin Usage
