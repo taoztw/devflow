@@ -1,5 +1,7 @@
 import mongoose, { Mongoose } from "mongoose";
 
+import logger from "./logger";
+
 const MONGODB_URL = process.env.MONGODB_URI as string;
 
 if (!MONGODB_URL) {
@@ -15,7 +17,11 @@ interface MongooseCache {
 
 declare global {
   // eslint-disable-next-line no-var
-  var mongoose: MongooseCache;
+  var mongoose: MongooseCache | undefined;
+}
+
+if (!global.mongoose) {
+  global.mongoose = { conn: null, promise: null };
 }
 
 const cached = global.mongoose;
@@ -26,6 +32,7 @@ if (!cached) {
 
 const dbConnect = async (): Promise<Mongoose> => {
   if (cached.conn) {
+    logger.info("Using existing MongoDB connection");
     return cached.conn;
   }
 
@@ -33,11 +40,11 @@ const dbConnect = async (): Promise<Mongoose> => {
     cached.promise = mongoose
       .connect(MONGODB_URL)
       .then((mongoose) => {
-        console.log("Connected to MongoDB");
+        logger.info("New MongoDB connection");
         return mongoose;
       })
       .catch((err) => {
-        console.error("Error connecting to MongoDB", err);
+        logger.error("Error connecting to MongoDB", err);
         return err;
       });
   }
