@@ -5,6 +5,7 @@ import HomeFilter from "@/components/filters/HomeFilter";
 import LocalSearch from "@/components/search/LocalSearch";
 import { Button } from "@/components/ui/button";
 import ROUTES from "@/constants/routes";
+import { api } from "@/lib/api";
 
 const questions = [
   {
@@ -52,6 +53,8 @@ async function Home({
 }) {
   const { query = "" } = await searchParams;
 
+  // const users = await api.users.getAll();
+  // console.log(users);
   return (
     <>
       <section className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
