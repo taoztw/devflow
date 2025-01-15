@@ -10,14 +10,14 @@ import dbConnect from "../mongoose";
 
 type ActionOptions<T> = {
   params?: T;
-  shema?: ZodSchema<T>;
+  schema?: ZodSchema<T>;
   authorize?: boolean;
 };
 
-async function action<T>({ params, shema, authorize }: ActionOptions<T>) {
-  if (params && shema) {
+async function action<T>({ params, schema, authorize }: ActionOptions<T>) {
+  if (params && schema) {
     try {
-      shema.parse(params);
+      schema.parse(params);
     } catch (error) {
       if (error instanceof ZodError) {
         return new ValidationError(

@@ -1,3 +1,4 @@
+"use server";
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
@@ -6,6 +7,7 @@ import Account from "@/db/account.model";
 import User from "@/db/user.model";
 import { ActionResponse, ErrorResponse } from "@/types/global";
 
+import action from "../handlers/actions";
 import handleError from "../handlers/error";
 import { SignUpSchema } from "../validations";
 
@@ -18,7 +20,7 @@ export async function signUpWithCredentials(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { name, username, email, password } = validationResult;
+  const { name, username, email, password } = validationResult.params!;
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -41,17 +43,20 @@ export async function signUpWithCredentials(
       session,
     });
     await Account.create(
-      {
-        userId: newUser._id,
-        name,
-        provider: "credentials",
-        providerAccountId: email,
-        password: hashedPassword,
-      },
+      [
+        {
+          userId: newUser._id,
+          name,
+          provider: "credentials",
+          providerAccountId: email,
+          password: hashedPassword,
+        },
+      ],
       { session }
     );
 
-    await signIn({ email, password, redirect: false });
+    await session.commitTransaction();
+    await signIn("credentials", { email, password, redirect: false });
 
     return { success: true };
   } catch (error) {
