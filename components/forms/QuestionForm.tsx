@@ -2,10 +2,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MDXEditorMethods } from "@mdxeditor/editor";
 import dynamic from "next/dynamic";
-import React, { useRef } from "react";
+import { useRouter } from "next/navigation";
+import React, { useRef, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import ROUTES from "@/constants/routes";
+import { toast } from "@/hooks/use-toast";
+import { createQuestion } from "@/lib/actions/question.actions";
 import { AskQuestionSchema } from "@/lib/validations";
 
 import TagCard from "../cards/TagCard";
@@ -27,6 +31,7 @@ const Editor = dynamic(() => import("@/components/editor"), {
 });
 
 const QuestionForm = () => {
+  const [isPending, startTransition] = useTransition();
   const editorRef = useRef<MDXEditorMethods>(null);
   const form = useForm<z.infer<typeof AskQuestionSchema>>({
     resolver: zodResolver(AskQuestionSchema),
@@ -37,6 +42,7 @@ const QuestionForm = () => {
     },
   });
 
+  const router = useRouter();
   const handleTagRemove = (tag: string, field: { value: string[] }) => {
     const newTags = field.value.filter((t) => t !== tag);
 
@@ -75,8 +81,30 @@ const QuestionForm = () => {
     }
   };
 
-  const handleCreateQuestion = (data: z.infer<typeof AskQuestionSchema>) => {
+  const handleCreateQuestion = async (
+    data: z.infer<typeof AskQuestionSchema>
+  ) => {
     console.log(data);
+    startTransition(async () => {
+      const result = await createQuestion(data);
+
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Question created successfully",
+        });
+
+        if (result.data) {
+          router.push(ROUTES.QUESTION(result.data?._id));
+        } else {
+          toast({
+            title: `Error ${result.status}`,
+            description: result.error?.message || "An error occurred",
+            variant: "destructive",
+          });
+        }
+      }
+    });
   };
   return (
     <Form {...form}>
@@ -145,6 +173,7 @@ const QuestionForm = () => {
                     className="paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 no-focus min-h-[56px] rounded-1.5 border"
                     onKeyDown={(e) => handleInputKeyDown(e, field)}
                   />
+                  {field.value}
                   {field.value.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">
                       {field.value.map((tag: string) => (
@@ -173,9 +202,16 @@ const QuestionForm = () => {
         <div className="mt-10 flex justify-end">
           <Button
             type="submit"
+            disabled={isPending}
             className="primary-gradient w-fit !text-light-900"
           >
-            Ask A Question
+            {isPending ? (
+              <>
+                <span>Submitting...</span>
+              </>
+            ) : (
+              <>Ask A Question</>
+            )}
           </Button>
         </div>
       </form>

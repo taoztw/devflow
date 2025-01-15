@@ -59,7 +59,7 @@ async function MobileNavigation() {
                 <SheetClose asChild>
                   <form
                     action={async () => {
-                      "user server";
+                      "use server";
                       signOut();
                     }}
                   >

@@ -1,6 +1,13 @@
-import QuestionForm from "@/components/forms/QuestionForm";
+import { redirect } from "next/navigation";
 
-function page() {
+import { auth } from "@/auth";
+import QuestionForm from "@/components/forms/QuestionForm";
+import ROUTES from "@/constants/routes";
+
+async function page() {
+  const session = await auth();
+
+  if (!session?.user) redirect(ROUTES.SIGN_IN);
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">All Questions</h1>

@@ -23,7 +23,7 @@ async function LeftSidebar() {
           <form
             action={async () => {
               "use server";
-              signOut();
+              await signOut();
             }}
           >
             <Button

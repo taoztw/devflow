@@ -5,7 +5,11 @@ import mongoose from "mongoose";
 import Question from "@/db/question.model";
 import TagQuestion from "@/db/tag-question.model";
 import Tag from "@/db/tag.model";
-import { ActionResponse, ErrorResponse } from "@/types/global";
+import {
+  ActionResponse,
+  ErrorResponse,
+  Question as IQuestion,
+} from "@/types/global";
 
 import action from "../handlers/actions";
 import handleError from "../handlers/error";
@@ -13,7 +17,7 @@ import { AskQuestionSchema } from "../validations";
 
 export async function createQuestion(
   params: CreateQuestionParams
-): Promise<ActionResponse> {
+): Promise<ActionResponse<IQuestion>> {
   const validationResult = await action({
     params,
     schema: AskQuestionSchema,
@@ -32,7 +36,7 @@ export async function createQuestion(
 
   try {
     const [question] = await Question.create(
-      [{ title, content, tags, userId }],
+      [{ title, content, author: userId }],
       { session }
     );
     const tagIds: mongoose.Types.ObjectId[] = [];
