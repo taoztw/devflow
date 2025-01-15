@@ -1,0 +1,72 @@
+"use server";
+
+import mongoose from "mongoose";
+
+import Question from "@/db/question.model";
+import TagQuestion from "@/db/tag-question.model";
+import Tag from "@/db/tag.model";
+import { ActionResponse, ErrorResponse } from "@/types/global";
+
+import action from "../handlers/actions";
+import handleError from "../handlers/error";
+import { AskQuestionSchema } from "../validations";
+
+export async function createQuestion(
+  params: CreateQuestionParams
+): Promise<ActionResponse> {
+  const validationResult = await action({
+    params,
+    schema: AskQuestionSchema,
+    authorize: true,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  const { title, content, tags } = validationResult.params!;
+  const userId = validationResult?.session?.user?.id;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const [question] = await Question.create(
+      [{ title, content, tags, userId }],
+      { session }
+    );
+    const tagIds: mongoose.Types.ObjectId[] = [];
+    const tagQuestionDocuments = [];
+
+    for (const tag of tags) {
+      const existingTag = await Tag.findOneAndUpdate(
+        {
+          name: { $regex: new RegExp(`^${tag}$`, "i") },
+        },
+        { $setOnInsert: { name: tag }, $inc: { questions: 1 } },
+        { upsert: true, new: true, session }
+      );
+      tagIds.push(existingTag._id);
+      tagQuestionDocuments.push({
+        tag: existingTag._id,
+        question: question._id,
+      });
+    }
+
+    await TagQuestion.insertMany(tagQuestionDocuments, { session });
+    await Question.findByIdAndUpdate(
+      question._id,
+      { $push: { tags: { $each: tagIds } } },
+      { session }
+    );
+
+    await session.commitTransaction();
+
+    return { success: true, data: JSON.parse(JSON.stringify(question)) };
+  } catch (error) {
+    await session.abortTransaction();
+    return handleError(error) as ErrorResponse;
+  } finally {
+    session.endSession();
+  }
+}
