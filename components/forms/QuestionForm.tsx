@@ -9,8 +9,9 @@ import { z } from "zod";
 
 import ROUTES from "@/constants/routes";
 import { toast } from "@/hooks/use-toast";
-import { createQuestion } from "@/lib/actions/question.actions";
+import { createQuestion, editQuestion } from "@/lib/actions/question.actions";
 import { AskQuestionSchema } from "@/lib/validations";
+import { Question } from "@/types/global";
 
 import TagCard from "../cards/TagCard";
 import { Button } from "../ui/button";
@@ -30,15 +31,20 @@ const Editor = dynamic(() => import("@/components/editor"), {
   ssr: false,
 });
 
-const QuestionForm = () => {
+interface Params {
+  question: Question;
+  isEdit?: boolean;
+}
+
+const QuestionForm = ({ question, isEdit }: Params) => {
   const [isPending, startTransition] = useTransition();
   const editorRef = useRef<MDXEditorMethods>(null);
   const form = useForm<z.infer<typeof AskQuestionSchema>>({
     resolver: zodResolver(AskQuestionSchema),
     defaultValues: {
-      title: "",
-      content: "",
-      tags: [],
+      title: question.title || "",
+      content: question.content || "",
+      tags: question.tags.map((tag) => tag.name) || [],
     },
   });
 
@@ -84,10 +90,32 @@ const QuestionForm = () => {
   const handleCreateQuestion = async (
     data: z.infer<typeof AskQuestionSchema>
   ) => {
-    console.log(data);
     startTransition(async () => {
-      const result = await createQuestion(data);
+      if (isEdit && question) {
+        const result = await editQuestion({
+          ...data,
+          questionId: question._id,
+        });
+        if (result.success) {
+          toast({
+            title: "Success",
+            description: "Question edited successfully",
+          });
 
+          if (result.data) {
+            router.push(ROUTES.QUESTION(result.data?._id));
+          } else {
+            toast({
+              title: `Error ${result.status}`,
+              description: result.error?.message || "An error occurred",
+              variant: "destructive",
+            });
+          }
+        }
+        return;
+      }
+
+      const result = await createQuestion(data);
       if (result.success) {
         toast({
           title: "Success",
@@ -210,7 +238,7 @@ const QuestionForm = () => {
                 <span>Submitting...</span>
               </>
             ) : (
-              <>Ask A Question</>
+              <>{isEdit ? "Edit" : "Ask A Question"}</>
             )}
           </Button>
         </div>
