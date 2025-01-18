@@ -1,60 +1,30 @@
 import Link from "next/link";
 
 import QuestionCard from "@/components/cards/QuestionCard";
+import DataRenderer from "@/components/DataRender";
 import HomeFilter from "@/components/filters/HomeFilter";
 import LocalSearch from "@/components/search/LocalSearch";
 import { Button } from "@/components/ui/button";
 import ROUTES from "@/constants/routes";
-import { api } from "@/lib/api";
-
-const questions = [
-  {
-    _id: "1",
-    title: "How to learn React?",
-    description: "I want to learn React, can anyone help me?",
-    tags: [
-      { _id: "1", name: "React" },
-      { _id: "2", name: "JavaScript" },
-    ],
-    author: {
-      _id: "1",
-      name: "John Doe",
-      image: "/images/tmp_avatar.jpeg",
-    },
-    upvotes: 10,
-    answers: 5,
-    views: 100,
-    createdAt: new Date(),
-  },
-  {
-    _id: "2",
-    title: "How to learn JavaScript?",
-    description: "I want to learn JavaScript, can anyone help me?",
-    tags: [
-      { _id: "1", name: "React" },
-      { _id: "2", name: "JavaScript" },
-    ],
-    author: {
-      _id: "1",
-      name: "John Doe",
-      image: "/images/tmp_avatar.jpeg",
-    },
-    upvotes: 10,
-    answers: 5,
-    views: 100,
-    createdAt: new Date(),
-  },
-];
+import { EMPTY_QUESTION } from "@/constants/states";
+import { getQuestions } from "@/lib/actions/question.actions";
 
 async function Home({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string }>;
 }) {
-  const { query = "" } = await searchParams;
+  const { page, pageSize, query, filter } = await searchParams;
 
-  // const users = await api.users.getAll();
-  // console.log(users);
+  const { success, data, error } = await getQuestions({
+    page: Number(page) || 1,
+    pageSize: Number(pageSize) || 10,
+    query: query || "",
+    filter: filter || "",
+  });
+
+  const { questions } = data || {};
+
   return (
     <>
       <section className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
@@ -77,11 +47,17 @@ async function Home({
         />
       </section>
       <HomeFilter />
-      <div className="flex flex-col gap-4">
-        {questions.map((question) => (
-          <QuestionCard key={question._id} question={question} />
-        ))}
-      </div>
+      <DataRenderer
+        success={success}
+        error={error}
+        data={questions}
+        empty={EMPTY_QUESTION}
+        render={(questions) =>
+          questions.map((question) => (
+            <QuestionCard key={question._id} question={question} />
+          ))
+        }
+      />
     </>
   );
 }

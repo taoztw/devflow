@@ -32,7 +32,7 @@ const Editor = dynamic(() => import("@/components/editor"), {
 });
 
 interface Params {
-  question: Question;
+  question?: Question;
   isEdit?: boolean;
 }
 
@@ -42,9 +42,9 @@ const QuestionForm = ({ question, isEdit }: Params) => {
   const form = useForm<z.infer<typeof AskQuestionSchema>>({
     resolver: zodResolver(AskQuestionSchema),
     defaultValues: {
-      title: question.title || "",
-      content: question.content || "",
-      tags: question.tags.map((tag) => tag.name) || [],
+      title: question?.title || "",
+      content: question?.content || "",
+      tags: question?.tags.map((tag) => tag.name) || [],
     },
   });
 
@@ -103,7 +103,7 @@ const QuestionForm = ({ question, isEdit }: Params) => {
           });
 
           if (result.data) {
-            router.push(ROUTES.QUESTION(result.data?._id));
+            router.push(ROUTES.QUESTION(result.data?._id as string));
           } else {
             toast({
               title: `Error ${result.status}`,

@@ -56,7 +56,7 @@ function TagCard({
     return isButton ? (
       <button className="flex justify-between gap-2">{content}</button>
     ) : (
-      <Link href={ROUTES.TAGS(_id)} className="flex justify-between gap-2">
+      <Link href={ROUTES.TAG(_id)} className="flex justify-between gap-2">
         {content}
 
         {showCount && (
@@ -67,7 +67,7 @@ function TagCard({
   }
 
   return (
-    <Link href={ROUTES.TAGS(_id)} className="flex justify-between gap-2">
+    <Link href={ROUTES.TAG(_id)} className="flex justify-between gap-2">
       {content}
 
       {showCount && (
