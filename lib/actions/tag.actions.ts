@@ -2,7 +2,7 @@ import { FilterQuery } from "mongoose";
 
 import { Question, Tag } from "@/db";
 import { IQuestionDoc } from "@/db/question.model";
-import { ITagDoc, ITagDoc } from "@/db/tag.model";
+import { ITagDoc } from "@/db/tag.model";
 import {
   ActionResponse,
   ErrorResponse,
