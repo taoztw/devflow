@@ -1,12 +1,13 @@
+"use server";
 import { FilterQuery } from "mongoose";
 
 import { Question, Tag } from "@/db";
-import { IQuestionDoc } from "@/db/question.model";
 import { ITagDoc } from "@/db/tag.model";
 import {
   ActionResponse,
   ErrorResponse,
   PaginatedSearchParams,
+  Question as IQuestion,
 } from "@/types/global";
 
 import action from "../handlers/actions";
@@ -84,7 +85,7 @@ export const getTags = async (
 export const getTagQuestions = async (
   params: GetTagQuestionsParams
 ): Promise<
-  ActionResponse<{ tag: ITagDoc; questions: IQuestionDoc[]; isNext: boolean }>
+  ActionResponse<{ tag: ITagDoc; questions: IQuestion[]; isNext: boolean }>
 > => {
   const validationResult = await action({
     params,
