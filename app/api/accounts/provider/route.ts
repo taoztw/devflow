@@ -6,7 +6,7 @@ import { NotFoundError, ValidationError } from "@/lib/http-errors";
 import dbConnect from "@/lib/mongoose";
 import { AccountSchema } from "@/lib/validations";
 import { APIErrorResponse } from "@/types/global";
-
+export const runtime = "edge";
 export async function POST(request: Request) {
   const body = await request.json();
   const { providerAccountId } = body;

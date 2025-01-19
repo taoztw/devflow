@@ -5,7 +5,7 @@ import QuestionForm from "@/components/forms/QuestionForm";
 import ROUTES from "@/constants/routes";
 import { getQuestion } from "@/lib/actions/question.actions";
 import { RouteParams } from "@/types/global";
-
+export const runtime = "edge";
 async function page({ params }: RouteParams) {
   const { id } = await params;
   if (!id) return notFound();

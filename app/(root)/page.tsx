@@ -9,6 +9,8 @@ import ROUTES from "@/constants/routes";
 import { EMPTY_QUESTION } from "@/constants/states";
 import { getQuestions } from "@/lib/actions/question.actions";
 
+export const runtime = "edge";
+
 async function Home({
   searchParams,
 }: {

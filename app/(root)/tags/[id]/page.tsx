@@ -8,6 +8,8 @@ import { EMPTY_QUESTION } from "@/constants/states";
 import { getTagQuestions } from "@/lib/actions/tag.actions";
 import { RouteParams } from "@/types/global";
 
+export const runtime = "edge";
+
 const Page = async ({ params, searchParams }: RouteParams) => {
   const { id } = await params;
   const { page, pageSize, query } = await searchParams;

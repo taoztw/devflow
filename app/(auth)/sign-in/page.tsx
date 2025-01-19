@@ -3,6 +3,8 @@ import { AuthForm } from "@/components/forms/AuthForm";
 import { signInWithCredentials } from "@/lib/actions/auth.actions";
 import { SignInSchema } from "@/lib/validations";
 
+export const runtime = "edge";
+
 function SignInPage() {
   return (
     <div>

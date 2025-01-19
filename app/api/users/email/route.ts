@@ -7,6 +7,8 @@ import dbConnect from "@/lib/mongoose";
 import { UserSchema } from "@/lib/validations";
 import { APIErrorResponse } from "@/types/global";
 
+export const runtime = "edge";
+
 export async function POST(request: Request) {
   const body = await request.json();
   const { email } = body;

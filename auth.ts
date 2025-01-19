@@ -10,8 +10,11 @@ import { api } from "./lib/api";
 import { SignInSchema } from "./lib/validations";
 import { ActionResponse } from "./types/global";
 
+console.log(process.env.AUTH_SECRET);
+
 // https://next-auth.js.org/configuration/callbacks
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
   providers: [
     GitHub,
     Google,

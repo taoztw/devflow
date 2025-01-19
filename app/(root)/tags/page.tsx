@@ -7,6 +7,8 @@ import { ITagDoc } from "@/db/tag.model";
 import { getTags } from "@/lib/actions/tag.actions";
 import { RouteParams } from "@/types/global";
 
+export const runtime = "edge";
+
 async function page({ searchParams }: RouteParams) {
   console.log(await searchParams, "seachParams");
   const { page, pageSize, query, filter } = await searchParams;

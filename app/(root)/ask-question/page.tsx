@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import QuestionForm from "@/components/forms/QuestionForm";
 import ROUTES from "@/constants/routes";
-
+export const runtime = "edge";
 async function page() {
   const session = await auth();
 

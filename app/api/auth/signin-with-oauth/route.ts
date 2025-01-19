@@ -10,6 +10,8 @@ import dbConnect from "@/lib/mongoose";
 import { SignInWithOAuthSchema } from "@/lib/validations";
 import { APIErrorResponse } from "@/types/global";
 
+export const runtime = "edge";
+
 export async function POST(request: Request) {
   const { provider, providerAccountId, user } = await request.json();
 
